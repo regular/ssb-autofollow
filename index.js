@@ -1,7 +1,7 @@
 const pull = require('pull-stream')
 const debug = require('debug')('ssb-autofollow')
 
-exports.name = 'ssb-autofollow'
+exports.name = 'autofollow'
 exports.version = require('./package.json').version
 exports.manifest = {}
 
