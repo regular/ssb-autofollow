@@ -1,0 +1,23 @@
+{
+  "name": "ssb-autofollow",
+  "version": "1.0.0",
+  "description": "This Scuttlebot plugin automatically follows feeds specified in the config file",
+  "main": "index.js",
+  "scripts": {
+    "test": "DEBUG=* tape test.js"
+  },
+  "keywords": [
+    "ssb"
+  ],
+  "author": "Jan Bölsche <jan@lagomorph.de> (https://regular.codes/)",
+  "license": "MIT",
+  "devDependencies": {
+    "scuttle-testbot": "^1.1.6",
+    "ssb-keys": "^7.0.16",
+    "tape": "^4.9.1"
+  },
+  "dependencies": {
+    "debug": "^3.1.0",
+    "pull-stream": "^3.6.9"
+  }
+}
