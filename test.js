@@ -27,9 +27,7 @@ test.only('one follow message, if one feed is specified', t => {
   const myTestSbot = CreateTestSbot({
     name: 'test2', 
     keys: lucyKeys,
-    config: {
-      autofollow: 'alice'
-    }
+    autofollow: 'alice'
   })
   const lucy = myTestSbot.createFeed(lucyKeys)
 

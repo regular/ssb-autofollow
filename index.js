@@ -5,7 +5,7 @@ exports.name = 'autofollow'
 exports.version = require('./package.json').version
 exports.manifest = {}
 
-exports.init = function (ssb, {config}) {
+exports.init = function (ssb, config) {
   debug(JSON.stringify(config))
   if (config && config.autofollow) {
     let to_follow = config.autofollow
