@@ -23,7 +23,7 @@ test('do nothing if no autofollow feed is specified', t => {
 })
 
 // NOTE: scuttle-testbot seems to fail if started again(?)
-test.only('one follow message, if one feed is specified', t => {
+test('one follow message, if one feed is specified', t => {
   const myTestSbot = CreateTestSbot({
     name: 'test2', 
     keys: lucyKeys,

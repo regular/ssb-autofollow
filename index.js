@@ -6,14 +6,13 @@ exports.version = require('./package.json').version
 exports.manifest = {}
 
 exports.init = function (ssb, config) {
-  debug(JSON.stringify(config))
-  if (config && config.autofollow) {
-    let to_follow = config.autofollow
+  let to_follow = config && config.autofollow
+  if (to_follow) {
     if (!Array.isArray(to_follow)) to_follow = [to_follow]
     ssb.whoami( (err, feed) => {
       if (err) throw err
       to_follow = to_follow.filter( x=>x !== feed.id )
-      if (!to_follow.length) return debug('config.autofollow is an empty array')
+      if (!to_follow.length) return debug('INFO: config.autofollow is an empty array')
       pull(
         ssb.createUserStream({
           id: feed.id,
@@ -23,8 +22,8 @@ exports.init = function (ssb, config) {
         pull.asyncMap( (value, cb) => {
           const content = value.content
           if (content && content.type == 'contact' && content.following) {
-            if (to_follow.indlucdes(content.contact)) {
-              debug('Already following %s', content.contact)
+            if (to_follow.includes(content.contact)) {
+              debug('INFO: Already following %s', content.contact)
               to_follow = to_follow.filter( x=>x !== content.contact )
               if (!to_follow.length) return cb(true)
             }
@@ -46,16 +45,16 @@ exports.init = function (ssb, config) {
               ssb.publish(content, cb)
             }),
             pull.drain( msg => {
-              debug('published follow message for %s', msg.value.content.contact)
+              debug('INFO: published follow message for %s', msg.value.content.contact)
             }, (err) => {
-              debug('done: %s', err ? err.message : 'no errors')
+              debug('INFO: done: %s', err ? err.message : 'no errors')
             })
           )
         })
       )
     })
   } else {
-    debug('No autofollow section in config')
+    debug('INFO: No autofollow section in config')
   }
   return {}
 }
