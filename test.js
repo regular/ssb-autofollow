@@ -1,12 +1,16 @@
 const test = require('tape')
 const pull = require('pull-stream')
 const ssbKeys = require('ssb-keys')
+const rimraf = require('rimraf')
+const {createSbot} = require('scuttlebot')
 
 const lucyKeys = ssbKeys.generate()
 
 test('do nothing if no autofollow feed is specified', t => {
-  const CreateTestSbot = require('scuttle-testbot').use(require('.'))
-  const myTestSbot = CreateTestSbot({ name: 'test1', keys: lucyKeys })
+  const myTestSbot = createSbot().use(require('.'))({
+    temp: true,
+    keys: lucyKeys
+  })
   const lucy = myTestSbot.createFeed(lucyKeys)
 
   setTimeout(() => {
@@ -15,17 +19,15 @@ test('do nothing if no autofollow feed is specified', t => {
       pull.collect((err, msgs) => {
         t.error(err)
         t.equals(msgs.length, 0, 'no message')
-        myTestSbot.close()
-        t.end()
+        myTestSbot.close(() => t.end() )
       })
     )
   }, 300)
 })
 
 test('one follow message, if one feed is specified', t => {
-  const CreateTestSbot = require('scuttle-testbot').use(require('.'))
-  const myTestSbot = CreateTestSbot({
-    name: 'test1', 
+  const myTestSbot = createSbot().use(require('.'))({
+    temp: true,
     keys: lucyKeys,
     autofollow: 'alice'
   })
@@ -50,17 +52,15 @@ test('one follow message, if one feed is specified', t => {
           'contact is correct'
         )
         t.equals(msg.value.content.following, true, 'following is true')
-        myTestSbot.close()
-        t.end()
+        myTestSbot.close( ()=> t.end() )
       })
     )
   }, 300)
 })
 
 test('array of feeds', t => {
-  const CreateTestSbot = require('scuttle-testbot').use(require('.'))
-  const myTestSbot = CreateTestSbot({
-    name: 'test1', 
+  const myTestSbot = createSbot().use(require('.'))({
+    temp: true,
     keys: lucyKeys,
     autofollow: ['alice', 'bob']
   })
@@ -100,19 +100,20 @@ test('array of feeds', t => {
         )
         t.equals(msg.value.content.following, true, 'following is true')
         
-        myTestSbot.close()
-        t.end()
+        myTestSbot.close( ()=> t.end() )
       })
     )
   }, 300)
 })
 
 test('pre-existing message', t => {
+  const path = '/tmp/test_preexisting'
+  rimraf.sync(path)
+
   function publish(cb) {
-    const CreateTestSbot = require('scuttle-testbot')
-    const myTestSbot = CreateTestSbot({
-      name: 'test1', 
-      keys: lucyKeys,
+    const myTestSbot = createSbot()({
+      path, 
+      keys: lucyKeys
     })
     const lucy = myTestSbot.createFeed(lucyKeys)
 
@@ -121,18 +122,16 @@ test('pre-existing message', t => {
       contact: 'alice',
       following: true
     }, err => {
-      myTestSbot.close()
-      cb(err)
+      t.error(err)
+      myTestSbot.close(cb)
     }) 
   }
       
   publish( err => {
     t.error(err)
     
-    const CreateTestSbot = require('scuttle-testbot').use(require('.'))
-    const myTestSbot = CreateTestSbot({
-      name: 'test1', 
-      startUnclean: true,
+    const myTestSbot = createSbot().use(require('.'))({
+      path, 
       keys: lucyKeys,
       autofollow: ['alice', 'bob']
     })
@@ -159,8 +158,7 @@ test('pre-existing message', t => {
           )
           t.equals(msg.value.content.following, true, 'following is true')
           
-          myTestSbot.close()
-          t.end()
+          myTestSbot.close( () => t.end() )
         })
       )
     }, 300)

@@ -12,7 +12,8 @@
   "author": "Jan Bölsche <jan@lagomorph.de> (https://regular.codes/)",
   "license": "MIT",
   "devDependencies": {
-    "scuttle-testbot": "^1.1.6",
+    "rimraf": "^2.6.3",
+    "scuttlebot": "^11.3.3",
     "ssb-keys": "^7.0.16",
     "tape": "^4.9.1"
   },
