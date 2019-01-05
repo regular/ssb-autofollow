@@ -11,11 +11,10 @@ test('do nothing if no autofollow feed is specified', t => {
     temp: true,
     keys: lucyKeys
   })
-  const lucy = myTestSbot.createFeed(lucyKeys)
 
   setTimeout(() => {
     pull(
-      myTestSbot.createFeedStream({}),
+      myTestSbot.createLogStream(),
       pull.collect((err, msgs) => {
         t.error(err)
         t.equals(msgs.length, 0, 'no message')
@@ -31,20 +30,16 @@ test('one follow message, if one feed is specified', t => {
     keys: lucyKeys,
     autofollow: 'alice'
   })
-  const lucy = myTestSbot.createFeed(lucyKeys)
 
   setTimeout(() => {
     pull(
-      myTestSbot.createFeedStream({}),
+      myTestSbot.createLogStream({}),
       pull.collect((err, msgs) => {
         t.error(err);
         t.equals(msgs.length, 1, 'one message');
         const msg = msgs[0]
 
-        t.equals(typeof msg.key, 'string', 'message has key')
-        t.equals(typeof msg.value, 'object', 'message has value')
         t.equals(msg.value.author, lucyKeys.id, 'message author is lucy')
-        t.equals(typeof msg.value.content, 'object', 'value has content')
         t.equals(msg.value.content.type, 'contact', 'content type is cotact');
         t.equals(
           msg.value.content.contact,
@@ -64,21 +59,17 @@ test('array of feeds', t => {
     keys: lucyKeys,
     autofollow: ['alice', 'bob']
   })
-  const lucy = myTestSbot.createFeed(lucyKeys)
 
   setTimeout(() => {
     pull(
-      myTestSbot.createFeedStream({}),
+      myTestSbot.createLogStream({}),
       pull.collect((err, msgs) => {
         t.error(err);
         t.equals(msgs.length, 2, 'two messages');
         let msg
 
         msg = msgs[0]
-        t.equals(typeof msg.key, 'string', 'message has key')
-        t.equals(typeof msg.value, 'object', 'message has value')
         t.equals(msg.value.author, lucyKeys.id, 'message author is lucy')
-        t.equals(typeof msg.value.content, 'object', 'value has content')
         t.equals(msg.value.content.type, 'contact', 'content type is cotact');
         t.equals(
           msg.value.content.contact,
@@ -88,11 +79,8 @@ test('array of feeds', t => {
         t.equals(msg.value.content.following, true, 'following is true')
         
         msg = msgs[1]
-        t.equals(typeof msg.key, 'string', 'message has key')
-        t.equals(typeof msg.value, 'object', 'message has value')
         t.equals(msg.value.author, lucyKeys.id, 'message author is lucy')
-        t.equals(typeof msg.value.content, 'object', 'value has content')
-        t.equals(msg.value.content.type, 'contact', 'content type is cotact');
+        t.equals(msg.value.content.type, 'contact', 'content type is cotact')
         t.equals(
           msg.value.content.contact,
           'bob',
@@ -135,7 +123,6 @@ test('pre-existing message', t => {
       keys: lucyKeys,
       autofollow: ['alice', 'bob']
     })
-    const lucy = myTestSbot.createFeed(lucyKeys)
 
     setTimeout( ()=>{
       pull(
@@ -146,10 +133,7 @@ test('pre-existing message', t => {
           let msg
 
           msg = msgs[1]
-          t.equals(typeof msg.key, 'string', 'message has key')
-          t.equals(typeof msg.value, 'object', 'message has value')
           t.equals(msg.value.author, lucyKeys.id, 'message author is lucy')
-          t.equals(typeof msg.value.content, 'object', 'value has content')
           t.equals(msg.value.content.type, 'contact', 'content type is cotact');
           t.equals(
             msg.value.content.contact,
