@@ -1,6 +1,6 @@
 {
   "name": "ssb-autofollow",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This Scuttlebot plugin automatically follows feeds specified in the config file",
   "main": "index.js",
   "scripts": {
