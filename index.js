@@ -1,18 +1,22 @@
 const pull = require('pull-stream')
-const debug = require('debug')('ssb-autofollow')
+const Log = require('./log')
 
 exports.name = 'autofollow'
 exports.version = require('./package.json').version
 exports.manifest = {}
 
 exports.init = function (ssb, config) {
+  const {error, warning, notice, info} = Log(ssb, exports.name)
   let to_follow = config && config.autofollow
   if (to_follow) {
     if (!Array.isArray(to_follow)) to_follow = [to_follow]
     ssb.whoami( (err, feed) => {
       if (err) throw err
       to_follow = to_follow.filter( x=>x !== feed.id )
-      if (!to_follow.length) return debug('INFO: config.autofollow is an empty array')
+      if (!to_follow.length) {
+        notice('config.autofollow is an empty array')
+        return
+      }
       pull(
         ssb.createUserStream({
           id: feed.id,
@@ -23,7 +27,7 @@ exports.init = function (ssb, config) {
           const content = value.content
           if (content && content.type == 'contact' && content.following) {
             if (to_follow.includes(content.contact)) {
-              debug('INFO: Already following %s', content.contact)
+              info('Already following %s', content.contact)
               to_follow = to_follow.filter( x=>x !== content.contact )
               if (!to_follow.length) return cb(true)
             }
@@ -45,16 +49,18 @@ exports.init = function (ssb, config) {
               ssb.publish(content, cb)
             }),
             pull.drain( msg => {
-              debug('INFO: published follow message for %s', msg.value.content.contact)
-            }, (err) => {
-              debug('INFO: done: %s', err ? err.message : 'no errors')
+              notice('published follow message for %s', msg.value.content.contact)
+            }, err => {
+              if (err) {
+                error(err.message)
+              }
             })
           )
         })
       )
     })
   } else {
-    debug('INFO: No autofollow section in config')
+    notice('No autofollow section in config')
   }
   return {}
 }
